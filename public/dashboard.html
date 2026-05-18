@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Restaurant Dashboard</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- ================= SIDEBAR ================= -->
+
+  <aside class="sidebar">
+
+    <h2 class="logo">
+      🍽️ Restaurant
+    </h2>
+
+    <ul class="menu">
+
+      <li onclick="loadSummary()">
+        📊 Dashboard
+      </li>
+
+      <li onclick="loadMenu()">
+        🍔 Menu Items
+      </li>
+
+      <!-- ADMIN ONLY -->
+      <li
+        id="ordersBtn"
+        onclick="loadOrders()"
+      >
+        📦 Orders
+      </li>
+
+      <li
+        id="ingredientsBtn"
+        onclick="loadIngredients()"
+      >
+        🥕 Ingredients
+      </li>
+
+      <li
+        id="expensesBtn"
+        onclick="loadExpenses()"
+      >
+        💸 Expenses
+      </li>
+
+      <li onclick="loadProfit()">
+        📈 Profit
+      </li>
+
+      <li onclick="logout()">
+        🚪 Logout
+      </li>
+
+    </ul>
+
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <h1>
+        Dashboard
+      </h1>
+
+      <h3 id="welcome"></h3>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="cards">
+
+      <div class="card">
+        <h4>💰 Revenue</h4>
+        <p id="revenue">0</p>
+      </div>
+
+      <div class="card">
+        <h4>💸 Expenses</h4>
+        <p id="expenses">0</p>
+      </div>
+
+      <div class="card">
+        <h4>🥕 Ingredients</h4>
+        <p id="ingredients">0</p>
+      </div>
+
+      <div class="card">
+        <h4>📈 Profit</h4>
+        <p id="profit">0</p>
+      </div>
+
+    </div>
+
+    <!-- DYNAMIC CONTENT -->
+    <div
+      id="content"
+      class="content-box"
+    >
+
+      <h2>
+        Welcome 👋
+      </h2>
+
+      <p>
+        Select a section from the sidebar.
+      </p>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-box">
+
+      <canvas id="profitChart"></canvas>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ================================================= -->
+<!-- ================= MODAL ========================= -->
+<!-- ================================================= -->
+
+<div
+  id="modal"
+  class="modal"
+  style="display:none;"
+>
+
+  <div class="modal-box">
+
+    <h2 id="modalTitle">
+      Form
+    </h2>
+
+    <!-- Dynamic Fields -->
+    <div id="modalBody"></div>
+
+    <!-- ACTIONS -->
+    <div class="modal-actions">
+
+      <button
+        class="btn save"
+        onclick="saveItem()"
+      >
+        💾 Save
+      </button>
+
+      <button
+        class="btn cancel"
+        onclick="closeModal()"
+      >
+        ❌ Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

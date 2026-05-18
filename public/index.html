@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <title>Restaurant Home</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/index.css">
+
+  <!-- PAGE STYLE -->
+  <style>
+
+    body{
+      background:
+        url("https://images.unsplash.com/photo-1504674900247-0877df9cc836")
+        no-repeat center center/cover;
+
+      color:white;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.6);
+      z-index:-1;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+  <h1>🍽️ My Restaurant</h1>
+
+  <nav>
+
+    <a href="index.html">
+      Home
+    </a>
+
+    <a href="#menu">
+      Menu
+    </a>
+
+    <a
+      href="login.html"
+      id="loginLink"
+    >
+      Login
+    </a>
+
+    <a
+      href="register.html"
+      id="registerLink"
+    >
+      Register
+    </a>
+
+    <a
+      href="dashboard.html"
+      id="dashboardLink"
+      style="display:none;"
+    >
+      Dashboard
+    </a>
+
+    <a
+      href="#"
+      id="logoutLink"
+      style="display:none;"
+      onclick="logout()"
+    >
+      Logout
+    </a>
+
+  </nav>
+
+</header>
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+  <h2>
+    Welcome to Our Restaurant 🍔
+  </h2>
+
+  <p>
+    Order your favorite food easily and fast
+  </p>
+
+  <button onclick="redirectToLogin()">
+    Order Now
+  </button>
+
+</section>
+
+<!-- ================= MENU ================= -->
+
+<section
+  id="menu"
+  class="menu-section"
+>
+
+  <h2>Browse Menu</h2>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+
+    <div class="filter-group">
+
+      <input
+        type="text"
+        id="search"
+        placeholder="🔍 Search food..."
+        onkeyup="searchMenu()"
+      >
+
+    </div>
+
+    <div class="filter-group">
+
+      <select
+        id="categoryFilter"
+        onchange="filterMenu()"
+      >
+
+        <option value="">
+          All Categories
+        </option>
+
+        <option value="foods">
+          🍽 Foods
+        </option>
+
+        <option value="cool drinks">
+          🥤 Cool Drinks
+        </option>
+
+        <option value="hot drinks">
+          ☕ Hot Drinks
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+  <!-- MENU ITEMS -->
+  <div
+    id="menu-container"
+    class="menu-grid"
+  ></div>
+
+</section>
+
+<!-- ================= TOAST ================= -->
+
+<div id="toast"></div>
+
+<!-- ================= SCRIPT ================= -->
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Order Food</title>
+
+  <!-- ================= CSS ================= -->
+  <link rel="stylesheet" href="css/order.css">
+
+  <!-- ================= GOOGLE FONT ================= -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+</head>
+
+<body>
+
+<!-- ================= PAGE PROTECTION ================= -->
+
+<script>
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user || !user.token) {
+
+    localStorage.setItem(
+      "redirectAfterLogin",
+      "order.html"
+    );
+
+    window.location.href = "login.html";
+  }
+
+</script>
+
+<!-- ================= CONTAINER ================= -->
+
+<div class="container">
+
+  <!-- ================= HEADER ================= -->
+
+  <div class="page-header">
+
+    <!-- LEFT -->
+    <div class="header-left">
+
+      <h2>
+        🍽️ Restaurant Menu
+      </h2>
+
+      <p>
+        Welcome,
+        <span id="customerName"></span>
+      </p>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="top-actions">
+
+      <button onclick="goHome()">
+        🏠 Home
+      </button>
+
+      <button onclick="goDashboard()">
+        📊 Dashboard
+      </button>
+
+      <button onclick="logout()">
+        🚪 Logout
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+
+  <div class="main-layout">
+
+    <!-- ================= LEFT CONTENT ================= -->
+
+    <div class="left-section">
+
+      <!-- ================= FILTERS ================= -->
+
+      <div class="filters">
+
+        <!-- SEARCH -->
+        <input
+          type="text"
+          id="search"
+          placeholder="🔍 Search food..."
+          onkeyup="searchMenu()"
+        >
+
+        <!-- CATEGORY -->
+        <select
+          id="categoryFilter"
+          onchange="filterMenu()"
+        >
+
+          <option value="">
+            📋 All Categories
+          </option>
+
+          <option value="foods">
+            🍽 Foods
+          </option>
+
+          <option value="cool drinks">
+            🥤 Cool Drinks
+          </option>
+
+          <option value="hot drinks">
+            ☕ Hot Drinks
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- ================= MENU TITLE ================= -->
+
+      <div class="section-title">
+
+        <h2>Menu</h2>
+
+      </div>
+
+      <!-- ================= MENU GRID ================= -->
+
+      <div
+        id="menu-container"
+        class="menu-grid"
+      >
+
+        <!-- Dynamic Menu -->
+
+      </div>
+
+    </div>
+
+    <!-- ================= RIGHT CART ================= -->
+
+    <div class="right-section">
+
+      <!-- ================= CART ================= -->
+
+      <div class="cart-box">
+
+        <div class="cart-header">
+
+          <h2>
+            🛒 Your Order
+          </h2>
+
+          <button
+            class="clear-cart-btn"
+            onclick="clearCart()"
+          >
+            🗑 Clear Cart
+          </button>
+
+        </div>
+
+        <!-- CART ITEMS -->
+
+        <div id="cart">
+
+          <p class="empty-cart">
+            🛒 No items yet
+          </p>
+
+        </div>
+
+        <hr>
+
+        <!-- TOTAL -->
+
+        <div class="total-box">
+
+          <h3>
+            Total:
+            <span id="cartTotal">
+              0
+            </span>
+            ETB
+          </h3>
+
+        </div>
+
+        <!-- PLACE ORDER -->
+
+        <button
+          class="place-order-btn"
+          onclick="placeOrder()"
+        >
+          ✅ Place Order
+        <button class="pay-btn"
+             onclick="payNow()">
+            💳 Pay Now
+                 </button>
+
+        <!-- CONFIRM DELIVERY -->
+
+        <button
+          class="confirm-btn"
+          onclick="confirmMyOrder(currentOrderId)"
+          id="confirmBtn"
+          style="display:none;"
+        >
+          📦 I Received My Order
+        </button>
+
+        <!-- ================= MY ORDERS BUTTON ================= -->
+
+        <button
+          onclick="loadMyOrders()"
+          class="my-orders-btn"
+        >
+          📦 My Orders
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= MY ORDERS SECTION ================= -->
+
+  <div
+    id="myOrdersSection"
+    class="my-orders-section"
+    style="display:none;"
+  >
+
+    <div class="orders-header">
+
+      <h2>
+        📦 My Orders
+      </h2>
+
+      <button
+        onclick="closeMyOrders()"
+        class="close-orders-btn"
+      >
+        ✖ Close
+      </button>
+
+    </div>
+
+    <!-- DYNAMIC ORDERS -->
+
+    <div id="myOrdersContainer">
+
+      <p>
+        No orders found
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+
+<div id="toast"></div>
+
+<!-- ================= SCRIPT ================= -->
+
+<script src="js/script.js"></script>
+
+<!-- ================= USER INFO ================= -->
+
+<script>
+
+  const currentUser =
+    JSON.parse(localStorage.getItem("user"));
+
+  if (currentUser) {
+
+    const nameEl =
+      document.getElementById("customerName");
+
+    if (nameEl) {
+
+      nameEl.innerText =
+        currentUser.name || "Customer";
+    }
+  }
+
+  // ================= CLOSE ORDERS =================
+
+  function closeMyOrders() {
+
+    const section =
+      document.getElementById("myOrdersSection");
+
+    if (section) {
+
+      section.style.display = "none";
+    }
+  }
+
+</script>
+
+</body>
+</html>
