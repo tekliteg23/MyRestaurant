@@ -1,5 +1,7 @@
 // ================= 🔐 AUTH SETUP =================
-const API_BASE = "http://localhost:5000";
+//const API_BASE = "http://localhost:5000";
+
+const API = "https://restaurant-backend.onrender.com";
 
 let user = null;
 let token = null;

@@ -1,5 +1,5 @@
 // ================= CONFIG =================
-const API = "http://localhost:5000";
+const API = "https://restaurant-backend.onrender.com";
 
 // ================= STATE =================
 let allMenu = [];
