@@ -8,7 +8,7 @@ const pool = mysql.createPool({
 
   host: process.env.DB_HOST,
 
-  port: process.env.DB_PORT || 3306,
+  port: process.env.DB_PORT,
 
   user: process.env.DB_USER,
 
@@ -20,17 +20,19 @@ const pool = mysql.createPool({
 
   connectionLimit: 10,
 
-  queueLimit: 0
+  queueLimit: 0,
+
+  connectTimeout: 10000
+
 });
 
-// ================= TEST DATABASE CONNECTION =================
+// ================= TEST CONNECTION =================
 
 (async () => {
 
   try {
 
-    const connection =
-      await pool.getConnection();
+    const connection = await pool.getConnection();
 
     console.log(
       "✅ MySQL Connected Successfully"
