@@ -1,12 +1,40 @@
 const express = require("express");
 const router = express.Router();
 
-const dashboardController = require("../controllers/dashboardController");
-const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
+const dashboardController =
+  require("../controllers/dashboardController");
 
-// 👮 ADMIN ONLY DASHBOARD
-router.get("/summary", verifyToken, isAdmin, dashboardController.getSummary);
+const {
+  verifyToken,
+  isAdmin
+} = require("../middleware/authMiddleware");
 
-router.get("/monthly-profit", verifyToken, isAdmin, dashboardController.getMonthlyProfit);
+// ================= ADMIN DASHBOARD SUMMARY =================
+
+router.get(
+  "/summary",
+  verifyToken,
+  isAdmin,
+  dashboardController.getSummary
+);
+
+// ================= DASHBOARD STATS =================
+// ✅ Added compatibility route
+
+router.get(
+  "/stats",
+  verifyToken,
+  isAdmin,
+  dashboardController.getSummary
+);
+
+// ================= MONTHLY PROFIT =================
+
+router.get(
+  "/monthly-profit",
+  verifyToken,
+  isAdmin,
+  dashboardController.getMonthlyProfit
+);
 
 module.exports = router;
