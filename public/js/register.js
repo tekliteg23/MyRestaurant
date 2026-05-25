@@ -1,7 +1,7 @@
 // ================= CONFIG =================
 //const API = "http://localhost:5000";
 
-const API = "https://habeshaminirestaurant.onrender.com";
+const API = "https://addisfoodhub.onrender.com";
 
 // ================= INIT =================
 window.onload = () => {

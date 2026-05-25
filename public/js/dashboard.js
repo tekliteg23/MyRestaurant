@@ -1,7 +1,7 @@
 // ================= 🔐 AUTH SETUP =================
 //const API_BASE = "http://localhost:5000";
 
-const API_BASE ="https://habeshaminirestaurant.onrender.com";
+const API_BASE ="https://addisfoodhub.onrender.com";
 
 let user = null;
 
