@@ -1,9 +1,12 @@
 // ================= CONFIG =================
+
 //const API = "http://localhost:5000";
 
-const API = "https://restaurant-backend-umgr.onrender.com";
+const API =
+  "https://restaurant-backend-umgr.onrender.com";
 
 // ================= INIT =================
+
 window.onload = () => {
 
   const form =
@@ -19,6 +22,7 @@ window.onload = () => {
 };
 
 // ================= LOGIN =================
+
 async function loginUser(e) {
 
   e.preventDefault();
@@ -35,7 +39,10 @@ async function loginUser(e) {
 
   if (!email || !password) {
 
-    showToast("Please fill all fields");
+    showToast(
+      "Please fill all fields"
+    );
+
     return;
   }
 
@@ -47,7 +54,8 @@ async function loginUser(e) {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json"
         },
 
         body: JSON.stringify({
@@ -57,32 +65,44 @@ async function loginUser(e) {
       }
     );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
     if (!res.ok) {
 
       showToast(
-        data.message || "Login failed"
+        data.message ||
+        "Login failed"
       );
 
       return;
     }
 
+    // ================= SAVE TOKEN =================
+
+    localStorage.setItem(
+      "token",
+      data.token
+    );
+
     // ================= SAVE USER =================
+
     localStorage.setItem(
       "user",
       JSON.stringify({
         id: data.user.id,
-        token: data.token,
         name: data.user.name,
         email: data.user.email,
         role: data.user.role
       })
     );
 
-    showToast("✅ Login successful");
+    showToast(
+      "✅ Login successful"
+    );
 
     // ================= SMART REDIRECT =================
+
     const redirect =
       localStorage.getItem(
         "redirectAfterLogin"
@@ -96,19 +116,24 @@ async function loginUser(e) {
           "redirectAfterLogin"
         );
 
-        window.location.href = redirect;
+        window.location.href =
+          redirect;
 
         return;
       }
 
       // ================= ADMIN =================
-      if (data.user.role === "admin") {
+
+      if (
+        data.user.role === "admin"
+      ) {
 
         window.location.href =
           "dashboard.html";
       }
 
-      // ================= USER =================
+      // ================= CUSTOMER =================
+
       else {
 
         window.location.href =
@@ -124,15 +149,20 @@ async function loginUser(e) {
       err
     );
 
-    showToast("Server error");
+    showToast(
+      "Server error"
+    );
   }
 }
 
 // ================= TOGGLE PASSWORD =================
+
 function togglePassword() {
 
   const input =
-    document.getElementById("password");
+    document.getElementById(
+      "password"
+    );
 
   input.type =
     input.type === "password"
@@ -141,24 +171,30 @@ function togglePassword() {
 }
 
 // ================= TOAST =================
+
 function showToast(message) {
 
   const toast =
-    document.getElementById("toast");
+    document.getElementById(
+      "toast"
+    );
 
   if (!toast) {
 
     alert(message);
+
     return;
   }
 
   toast.innerText = message;
 
-  toast.style.display = "block";
+  toast.style.display =
+    "block";
 
   setTimeout(() => {
 
-    toast.style.display = "none";
+    toast.style.display =
+      "none";
 
   }, 3000);
 }

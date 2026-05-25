@@ -4,15 +4,21 @@
 const API_BASE ="https://restaurant-backend-umgr.onrender.com";
 
 let user = null;
-let token = null;
 
 try {
-  user = JSON.parse(localStorage.getItem("user"));
-  token = localStorage.getItem("token") || user?.token || null;
+
+  user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
 } catch (e) {
+
   user = null;
-  token = null;
 }
+
+// ✅ GET TOKEN SAFELY
+const token =
+  localStorage.getItem("token");
 
 // ================= PAGE PROTECTION =================
 if (!token || !user) {
@@ -59,31 +65,61 @@ function showUser() {
 
 // ================= AUTH FETCH =================
 async function authFetch(url, options = {}) {
+
   try {
-    const res = await fetch(`${API_BASE}${url}`, {
-      ...options,
 
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${API_BASE}${url}`,
+      {
+        ...options,
 
-        ...(options.body instanceof FormData
-          ? {}
-          : { "Content-Type": "application/json" }),
-      },
-    });
+        headers: {
 
-    // ✅ Auto logout if token expired
-    if (res.status === 401 || res.status === 403) {
-      alert("Session expired. Please login again.");
+          Authorization:
+            `Bearer ${token}`,
+
+          ...(options.body instanceof FormData
+            ? {}
+            : {
+                "Content-Type":
+                  "application/json"
+              }),
+        },
+      }
+    );
+
+    // ✅ HANDLE LOGIN EXPIRATION
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
       logout();
+
       return null;
     }
 
-    return await res.json();
+    // ✅ SAFE JSON
+    const data =
+      await response.json();
 
-  } catch (err) {
-    console.error("AUTH FETCH ERROR:", err);
-    alert("Network error");
+    return data;
+
+  } catch (error) {
+
+    console.error(
+      "AUTH FETCH ERROR:",
+      error
+    );
+
+    alert(
+      "Network error"
+    );
+
     return null;
   }
 }
