@@ -2,7 +2,7 @@
 
 //const API = "http://localhost:5000";
 
-const API ="https://addisfoodhub.onrender.com";
+const API ="https://restaurant-backend-umgr.onrender.com";
 
 // ================= INIT =================
 
