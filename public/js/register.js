@@ -1,7 +1,7 @@
 // ================= CONFIG =================
 //const API = "http://localhost:5000";
 
-const API = "https://restaurant-backend-umgr.onrender.com";
+const API = "https://yourrestaurant23.onrender.com";
 
 // ================= INIT =================
 window.onload = () => {
