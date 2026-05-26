@@ -2,7 +2,7 @@
 
 //const API = "http://localhost:5000";
 
-const API = "https://yourrestaurant23.onrender.com";
+const API = "https://restaurant-backend-umgr.onrender.com";
 
 // ================= STATE =================
 let allMenu = [];
