@@ -166,15 +166,15 @@ async function loginUser(e) {
       ) {
 
         window.location.href =
-          "dashboard.html";
+           "./dashboard.html";
       }
 
       // ================= CUSTOMER =================
 
       else {
 
-        window.location.href =
-          "order.html";
+      window.location.href =
+              "./order.html";
       }
 
     }, 1000);
