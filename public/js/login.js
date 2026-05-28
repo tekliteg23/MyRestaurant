@@ -52,7 +52,7 @@ async function loginUser(e) {
 
   try {
 
-    // ================= REQUEST =================
+    // ================= API REQUEST =================
 
     const res = await fetch(
       `${API}/api/auth/login`,
@@ -81,7 +81,7 @@ async function loginUser(e) {
       data
     );
 
-    // ================= HANDLE ERROR =================
+    // ================= HANDLE SERVER ERROR =================
 
     if (!res.ok) {
 
@@ -113,21 +113,28 @@ async function loginUser(e) {
 
     // ================= SAVE USER =================
 
+    const userData = {
+      id:
+        data.user?.id || "",
+
+      name:
+        data.user?.name || "",
+
+      email:
+        data.user?.email || "",
+
+      role:
+        data.user?.role || "customer"
+    };
+
     localStorage.setItem(
       "user",
-      JSON.stringify({
-        id:
-          data.user?.id || "",
+      JSON.stringify(userData)
+    );
 
-        name:
-          data.user?.name || "",
-
-        email:
-          data.user?.email || "",
-
-        role:
-          data.user?.role || "customer"
-      })
+    console.log(
+      "SAVED USER:",
+      userData
     );
 
     // ================= SUCCESS =================
@@ -136,45 +143,41 @@ async function loginUser(e) {
       "✅ Login successful"
     );
 
-    // ================= SMART REDIRECT =================
-
-    const redirect =
-      localStorage.getItem(
-        "redirectAfterLogin"
-      );
+    // ================= REDIRECT =================
 
     setTimeout(() => {
 
-      // Redirect back to requested page
-      if (redirect) {
+      // SAFE ROLE CHECK
+      const role =
+        userData.role;
 
-        localStorage.removeItem(
-          "redirectAfterLogin"
-        );
-
-        window.location.href =
-          redirect;
-
-        return;
-      }
+      console.log(
+        "USER ROLE:",
+        role
+      );
 
       // ================= ADMIN =================
 
-      if (
-        data.user &&
-        data.user.role === "admin"
-      ) {
+      if (role === "admin") {
+
+        console.log(
+          "Redirecting to dashboard..."
+        );
 
         window.location.href =
-           "./dashboard.html";
+          "/dashboard.html";
       }
 
       // ================= CUSTOMER =================
 
       else {
 
-      window.location.href =
-              "./order.html";
+        console.log(
+          "Redirecting to order page..."
+        );
+
+        window.location.href =
+          "/order.html";
       }
 
     }, 1000);
