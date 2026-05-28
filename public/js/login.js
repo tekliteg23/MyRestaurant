@@ -1,8 +1,11 @@
 // ================= CONFIG =================
 
-//const API = "http://localhost:5000";
+// Localhost for development
+// const API = "http://localhost:5000";
 
-const API ="https://restaurant-backend-umgr.onrender.com";
+// Production Render API
+const API =
+  "https://restaurant-backend-umgr.onrender.com";
 
 // ================= INIT =================
 
@@ -36,6 +39,8 @@ async function loginUser(e) {
       .value
       .trim();
 
+  // ================= VALIDATION =================
+
   if (!email || !password) {
 
     showToast(
@@ -46,6 +51,8 @@ async function loginUser(e) {
   }
 
   try {
+
+    // ================= REQUEST =================
 
     const res = await fetch(
       `${API}/api/auth/login`,
@@ -64,14 +71,34 @@ async function loginUser(e) {
       }
     );
 
+    // ================= RESPONSE =================
+
     const data =
       await res.json();
+
+    console.log(
+      "LOGIN RESPONSE:",
+      data
+    );
+
+    // ================= HANDLE ERROR =================
 
     if (!res.ok) {
 
       showToast(
         data.message ||
         "Login failed"
+      );
+
+      return;
+    }
+
+    // ================= CHECK TOKEN =================
+
+    if (!data.token) {
+
+      showToast(
+        "Token missing from server"
       );
 
       return;
@@ -89,12 +116,21 @@ async function loginUser(e) {
     localStorage.setItem(
       "user",
       JSON.stringify({
-        id: data.user.id,
-        name: data.user.name,
-        email: data.user.email,
-        role: data.user.role
+        id:
+          data.user?.id || "",
+
+        name:
+          data.user?.name || "",
+
+        email:
+          data.user?.email || "",
+
+        role:
+          data.user?.role || "customer"
       })
     );
+
+    // ================= SUCCESS =================
 
     showToast(
       "✅ Login successful"
@@ -109,6 +145,7 @@ async function loginUser(e) {
 
     setTimeout(() => {
 
+      // Redirect back to requested page
       if (redirect) {
 
         localStorage.removeItem(
@@ -124,6 +161,7 @@ async function loginUser(e) {
       // ================= ADMIN =================
 
       if (
+        data.user &&
         data.user.role === "admin"
       ) {
 
@@ -178,6 +216,7 @@ function showToast(message) {
       "toast"
     );
 
+  // Fallback alert
   if (!toast) {
 
     alert(message);
@@ -185,7 +224,8 @@ function showToast(message) {
     return;
   }
 
-  toast.innerText = message;
+  toast.innerText =
+    message;
 
   toast.style.display =
     "block";
