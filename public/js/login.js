@@ -123,7 +123,6 @@ async function loginUser(e) {
       email:
         data.user?.email || "",
 
-      // DEFAULT ROLE = user
       role:
         data.user?.role || "user"
     };
@@ -172,12 +171,9 @@ async function loginUser(e) {
         return;
       }
 
-      // ================= USER / CUSTOMER =================
+      // ================= USER =================
 
-      if (
-        role === "user" ||
-        role === "customer"
-      ) {
+      if (role === "user") {
 
         console.log(
           "Redirecting to order page..."
