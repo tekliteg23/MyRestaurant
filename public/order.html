@@ -13,9 +13,14 @@
   <title>Order Food</title>
 
   <!-- ================= CSS ================= -->
-  <link rel="stylesheet" href="css/order.css">
+
+  <link
+    rel="stylesheet"
+    href="css/order.css"
+  >
 
   <!-- ================= GOOGLE FONT ================= -->
+
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
@@ -29,16 +34,25 @@
 
 <script>
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =
+    JSON.parse(
+      localStorage.getItem("user")
+    );
 
-  if (!user || !user.token) {
+  const token =
+    localStorage.getItem("token");
+
+  // ================= CHECK LOGIN =================
+
+  if (!user || !token) {
 
     localStorage.setItem(
       "redirectAfterLogin",
       "order.html"
     );
 
-    window.location.href = "login.html";
+    window.location.href =
+      "login.html";
   }
 
 </script>
@@ -52,6 +66,7 @@
   <div class="page-header">
 
     <!-- LEFT -->
+
     <div class="header-left">
 
       <h2>
@@ -66,6 +81,7 @@
     </div>
 
     <!-- RIGHT -->
+
     <div class="top-actions">
 
       <button onclick="goHome()">
@@ -88,7 +104,7 @@
 
   <div class="main-layout">
 
-    <!-- ================= LEFT CONTENT ================= -->
+    <!-- ================= LEFT SECTION ================= -->
 
     <div class="left-section">
 
@@ -97,6 +113,7 @@
       <div class="filters">
 
         <!-- SEARCH -->
+
         <input
           type="text"
           id="search"
@@ -105,6 +122,7 @@
         >
 
         <!-- CATEGORY -->
+
         <select
           id="categoryFilter"
           onchange="filterMenu()"
@@ -151,13 +169,15 @@
 
     </div>
 
-    <!-- ================= RIGHT CART ================= -->
+    <!-- ================= RIGHT SECTION ================= -->
 
     <div class="right-section">
 
-      <!-- ================= CART ================= -->
+      <!-- ================= CART BOX ================= -->
 
       <div class="cart-box">
+
+        <!-- CART HEADER -->
 
         <div class="cart-header">
 
@@ -200,19 +220,25 @@
 
         </div>
 
-        <!-- PLACE ORDER -->
+        <!-- ================= PLACE ORDER ================= -->
 
         <button
           class="place-order-btn"
           onclick="placeOrder()"
         >
           ✅ Place Order
-        <button class="pay-btn"
-             onclick="payNow()">
-            💳 Pay Now
-                 </button>
+        </button>
 
-        <!-- CONFIRM DELIVERY -->
+        <!-- ================= PAY NOW ================= -->
+
+        <button
+          class="pay-btn"
+          onclick="payNow()"
+        >
+          💳 Pay Now
+        </button>
+
+        <!-- ================= CONFIRM DELIVERY ================= -->
 
         <button
           class="confirm-btn"
@@ -223,7 +249,7 @@
           📦 I Received My Order
         </button>
 
-        <!-- ================= MY ORDERS BUTTON ================= -->
+        <!-- ================= MY ORDERS ================= -->
 
         <button
           onclick="loadMyOrders()"
@@ -279,7 +305,7 @@
 
 <div id="toast"></div>
 
-<!-- ================= SCRIPT ================= -->
+<!-- ================= MAIN SCRIPT ================= -->
 
 <script src="js/script.js"></script>
 
@@ -288,12 +314,16 @@
 <script>
 
   const currentUser =
-    JSON.parse(localStorage.getItem("user"));
+    JSON.parse(
+      localStorage.getItem("user")
+    );
 
   if (currentUser) {
 
     const nameEl =
-      document.getElementById("customerName");
+      document.getElementById(
+        "customerName"
+      );
 
     if (nameEl) {
 
@@ -307,11 +337,14 @@
   function closeMyOrders() {
 
     const section =
-      document.getElementById("myOrdersSection");
+      document.getElementById(
+        "myOrdersSection"
+      );
 
     if (section) {
 
-      section.style.display = "none";
+      section.style.display =
+        "none";
     }
   }
 
