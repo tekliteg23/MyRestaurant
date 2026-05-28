@@ -81,7 +81,7 @@ async function loginUser(e) {
       data
     );
 
-    // ================= HANDLE SERVER ERROR =================
+    // ================= HANDLE LOGIN ERROR =================
 
     if (!res.ok) {
 
@@ -123,8 +123,9 @@ async function loginUser(e) {
       email:
         data.user?.email || "",
 
+      // DEFAULT ROLE = user
       role:
-        data.user?.role || "customer"
+        data.user?.role || "user"
     };
 
     localStorage.setItem(
@@ -147,9 +148,10 @@ async function loginUser(e) {
 
     setTimeout(() => {
 
-      // SAFE ROLE CHECK
       const role =
-        userData.role;
+        userData.role
+          .toLowerCase()
+          .trim();
 
       console.log(
         "USER ROLE:",
@@ -166,11 +168,16 @@ async function loginUser(e) {
 
         window.location.href =
           "/dashboard.html";
+
+        return;
       }
 
-      // ================= CUSTOMER =================
+      // ================= USER / CUSTOMER =================
 
-      else {
+      if (
+        role === "user" ||
+        role === "customer"
+      ) {
 
         console.log(
           "Redirecting to order page..."
@@ -178,7 +185,20 @@ async function loginUser(e) {
 
         window.location.href =
           "/order.html";
+
+        return;
       }
+
+      // ================= UNKNOWN ROLE =================
+
+      console.log(
+        "Unknown role:",
+        role
+      );
+
+      showToast(
+        "Invalid user role"
+      );
 
     }, 1000);
 
