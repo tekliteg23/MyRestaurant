@@ -130,10 +130,10 @@ exports.initializePayment = async (req, res) => {
         tx_ref,
 
         callback_url:
-          `http://localhost:5000/api/payment/verify/${tx_ref}`,
+           `https://restaurant-backend-umgr.onrender.com/api/payment/verify/${tx_ref}`,
 
         return_url:
-          "http://localhost:5500/payment-success.html"
+               "https://restaurant-backend-umgr.onrender.com/payment-success.html"
       },
       {
         headers: {
@@ -245,9 +245,9 @@ exports.verifyPayment = async (req, res) => {
 
     // ================= REDIRECT =================
 
-    res.redirect(
-      "http://localhost:5500/payment-success.html"
-    );
+     res.redirect(
+        "https://restaurant-backend-umgr.onrender.com/payment-success.html"
+        );
 
   } catch (error) {
 
