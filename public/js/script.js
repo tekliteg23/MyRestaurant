@@ -1,7 +1,9 @@
 // ================= CONFIG =================
 
-//const API = "http://localhost:5000";
+// Localhost for development
+// const API = "http://localhost:5000";
 
+// Production Render API
 const API = "https://restaurant-backend-umgr.onrender.com";
 
 // ================= STATE =================
@@ -12,25 +14,34 @@ let currentOrderId = null;
 
 // ================= GET USER =================
 function getUser() {
-  return JSON.parse(localStorage.getItem("user"));
+
+  return JSON.parse(
+    localStorage.getItem("user")
+  );
 }
 
 // ================= GET TOKEN =================
 function getToken() {
-  const user = getUser();
-  return user?.token || null;
+
+  return localStorage.getItem(
+    "token"
+  );
 }
 
 // ================= AUTH HEADERS =================
 function authHeaders() {
+
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`
+
+    Authorization:
+      `Bearer ${getToken()}`
   };
 }
 
 // ================= CHECK LOGIN =================
 function isLoggedIn() {
+
   return !!getToken();
 }
 
@@ -39,28 +50,34 @@ function redirectToLogin() {
 
   const user = getUser();
 
-  if (!user || !user.token) {
+  if (!user || !getToken()) {
 
     localStorage.setItem(
       "redirectAfterLogin",
       "order.html"
     );
 
-    window.location.href = "login.html";
+    window.location.href =
+      "login.html";
+
     return;
   }
 
-  window.location.href = "order.html";
+  window.location.href =
+    "order.html";
 }
 
 // ================= LOGOUT =================
 function logout() {
 
   localStorage.removeItem("user");
+
   localStorage.removeItem("cart");
+
   localStorage.removeItem("token");
 
-  window.location.href = "login.html";
+  window.location.href =
+    "login.html";
 }
 
 // ================= LOAD MENU =================
@@ -68,23 +85,34 @@ async function loadMenu() {
 
   try {
 
-    const response = await fetch(`${API}/api/menu`);
+    const response = await fetch(
+      `${API}/api/menu`
+    );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (!response.ok) {
-      console.error(data.message);
+
+      console.error(
+        data.message
+      );
+
       return;
     }
 
     allMenu = data;
+
     filteredMenu = data;
 
     renderMenu(filteredMenu);
 
   } catch (error) {
 
-    console.error("Load Menu Error:", error);
+    console.error(
+      "Load Menu Error:",
+      error
+    );
   }
 }
 
@@ -92,7 +120,9 @@ async function loadMenu() {
 function renderMenu(menu) {
 
   const container =
-    document.getElementById("menu-container");
+    document.getElementById(
+      "menu-container"
+    );
 
   if (!container) return;
 
@@ -104,46 +134,56 @@ function renderMenu(menu) {
     return;
   }
 
-  container.innerHTML = menu.map(item => `
+  container.innerHTML =
+    menu.map(item => `
 
-    <div class="menu-card">
+      <div class="menu-card">
 
-      <img
-        src="${item.image ? API + item.image : 'https://via.placeholder.com/300'}"
-        alt="${item.name}"
-        class="menu-image"
-      >
+        <img
+          src="${
+            item.image
+              ? API + item.image
+              : 'https://via.placeholder.com/300'
+          }"
+          alt="${item.name}"
+          class="menu-image"
+        >
 
-      <h3>${item.name}</h3>
+        <h3>${item.name}</h3>
 
-      <p class="price">
-        ${item.price} ETB
-      </p>
+        <p class="price">
+          ${item.price} ETB
+        </p>
 
-      <p class="category">
-        ${item.category}
-      </p>
+        <p class="category">
+          ${item.category}
+        </p>
 
-      <button onclick="addToCart(${item.id})">
-        Add To Cart
-      </button>
+        <button
+          onclick="addToCart(${item.id})"
+        >
+          Add To Cart
+        </button>
 
-    </div>
+      </div>
 
-  `).join("");
+    `).join("");
 }
 
 // ================= SEARCH MENU =================
 function searchMenu() {
 
   const search =
-    document.getElementById("search")
-      ?.value
-      .toLowerCase();
+    document.getElementById(
+      "search"
+    )?.value.toLowerCase();
 
-  filteredMenu = allMenu.filter(item =>
-    item.name.toLowerCase().includes(search)
-  );
+  filteredMenu =
+    allMenu.filter(item =>
+      item.name
+        .toLowerCase()
+        .includes(search)
+    );
 
   renderMenu(filteredMenu);
 }
@@ -152,8 +192,9 @@ function searchMenu() {
 function filterMenu() {
 
   const category =
-    document.getElementById("categoryFilter")
-      ?.value;
+    document.getElementById(
+      "categoryFilter"
+    )?.value;
 
   if (!category) {
 
@@ -161,9 +202,11 @@ function filterMenu() {
 
   } else {
 
-    filteredMenu = allMenu.filter(
-      item => item.category === category
-    );
+    filteredMenu =
+      allMenu.filter(
+        item =>
+          item.category === category
+      );
   }
 
   renderMenu(filteredMenu);
@@ -179,18 +222,23 @@ function addToCart(id) {
       "order.html"
     );
 
-    window.location.href = "login.html";
+    window.location.href =
+      "login.html";
 
     return;
   }
 
   const item =
-    allMenu.find(m => m.id === id);
+    allMenu.find(
+      m => m.id === id
+    );
 
   if (!item) return;
 
   const existing =
-    cart.find(c => c.id === id);
+    cart.find(
+      c => c.id === id
+    );
 
   if (existing) {
 
@@ -199,10 +247,15 @@ function addToCart(id) {
   } else {
 
     cart.push({
+
       id: item.id,
+
       name: item.name,
+
       price: item.price,
+
       image: item.image,
+
       quantity: 1
     });
   }
@@ -214,7 +267,9 @@ function addToCart(id) {
 
   renderCart();
 
-  showToast("Item added to cart");
+  showToast(
+    "✅ Item added to cart"
+  );
 }
 
 // ================= CLEAR CART =================
@@ -226,7 +281,9 @@ function clearCart() {
 
   renderCart();
 
-  showToast("Cart cleared");
+  showToast(
+    "Cart cleared"
+  );
 }
 
 // ================= REMOVE FROM CART =================
@@ -251,14 +308,20 @@ function renderCart() {
     document.getElementById("cart");
 
   const totalSpan =
-    document.getElementById("cartTotal");
+    document.getElementById(
+      "cartTotal"
+    );
 
-  if (!cartDiv || !totalSpan) return;
+  if (!cartDiv || !totalSpan)
+    return;
 
   if (cart.length === 0) {
 
-    cartDiv.innerHTML =
-      "<p>No items yet</p>";
+    cartDiv.innerHTML = `
+      <p class="empty-cart">
+        🛒 No items yet
+      </p>
+    `;
 
     totalSpan.innerText = "0";
 
@@ -267,37 +330,43 @@ function renderCart() {
 
   let total = 0;
 
-  cartDiv.innerHTML = cart.map(item => {
+  cartDiv.innerHTML =
+    cart.map(item => {
 
-    total += item.price * item.quantity;
+      total +=
+        item.price * item.quantity;
 
-    return `
+      return `
 
-      <div class="cart-item">
+        <div class="cart-item">
 
-        <img
-          src="${API}${item.image}"
-          width="60"
-        >
+          <img
+            src="${API}${item.image}"
+            width="60"
+          >
 
-        <div>
+          <div>
 
-          <h4>${item.name}</h4>
+            <h4>${item.name}</h4>
 
-          <p>
-            ${item.quantity} × ${item.price} ETB
-          </p>
+            <p>
+              ${item.quantity}
+              ×
+              ${item.price} ETB
+            </p>
+
+          </div>
+
+          <button
+            onclick="removeFromCart(${item.id})"
+          >
+            ❌
+          </button>
 
         </div>
 
-        <button onclick="removeFromCart(${item.id})">
-          ❌
-        </button>
-
-      </div>
-
-    `;
-  }).join("");
+      `;
+    }).join("");
 
   totalSpan.innerText = total;
 }
@@ -309,28 +378,35 @@ async function placeOrder() {
 
     if (cart.length === 0) {
 
-      showToast("Cart is empty");
+      showToast(
+        "Cart is empty"
+      );
+
       return;
     }
 
     const user = getUser();
 
-    if (!user || !user.token) {
+    if (!user || !getToken()) {
 
       localStorage.setItem(
         "redirectAfterLogin",
         "order.html"
       );
 
-      window.location.href = "login.html";
+      window.location.href =
+        "login.html";
 
       return;
     }
 
-    const items = cart.map(item => ({
-      menu_id: item.id,
-      quantity: item.quantity
-    }));
+    const items =
+      cart.map(item => ({
+
+        menu_id: item.id,
+
+        quantity: item.quantity
+      }));
 
     const response = await fetch(
       `${API}/api/orders`,
@@ -340,27 +416,40 @@ async function placeOrder() {
         headers: authHeaders(),
 
         body: JSON.stringify({
-          customer_name: user.name,
+
+          customer_name:
+            user.name,
+
           items
         })
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (!response.ok) {
 
-      showToast(data.message || "Order failed");
+      showToast(
+        data.message ||
+        "Order failed"
+      );
+
       return;
     }
 
-    currentOrderId = data.order_id;
+    currentOrderId =
+      data.order_id;
 
-    showToast("✅ Order placed successfully");
+    showToast(
+      "✅ Order placed successfully"
+    );
 
     cart = [];
 
-    localStorage.removeItem("cart");
+    localStorage.removeItem(
+      "cart"
+    );
 
     renderCart();
 
@@ -373,7 +462,9 @@ async function placeOrder() {
       error
     );
 
-    showToast("Failed to place order");
+    showToast(
+      "Failed to place order"
+    );
   }
 }
 
@@ -386,28 +477,36 @@ async function confirmMyOrder(orderId) {
       `${API}/api/orders/${orderId}/confirm`,
       {
         method: "PUT",
+
         headers: authHeaders()
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (!response.ok) {
 
-      showToast(data.message);
+      showToast(
+        data.message
+      );
+
       return;
     }
 
-    showToast(data.message);
+    showToast(
+      data.message
+    );
 
-    // ✅ REFRESH ORDERS
     loadMyOrders();
 
   } catch (error) {
 
     console.error(error);
 
-    showToast("Server error");
+    showToast(
+      "Server error"
+    );
   }
 }
 
@@ -423,27 +522,35 @@ async function loadMyOrders() {
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (!response.ok) {
 
-      showToast(data.message || "Failed to load orders");
+      showToast(
+        data.message ||
+        "Failed to load orders"
+      );
+
       return;
     }
 
-    // ✅ CORRECT CONTAINER
     const section =
-      document.getElementById("myOrdersSection");
+      document.getElementById(
+        "myOrdersSection"
+      );
 
     const container =
-      document.getElementById("myOrdersContainer");
+      document.getElementById(
+        "myOrdersContainer"
+      );
 
-    if (!container || !section) return;
+    if (!container || !section)
+      return;
 
-    // ✅ SHOW SECTION
-    section.style.display = "block";
+    section.style.display =
+      "block";
 
-    // ================= NO ORDERS =================
     if (data.length === 0) {
 
       container.innerHTML = `
@@ -453,7 +560,6 @@ async function loadMyOrders() {
       return;
     }
 
-    // ================= GROUP ORDERS =================
     const groupedOrders = {};
 
     data.forEach(item => {
@@ -461,26 +567,39 @@ async function loadMyOrders() {
       if (!groupedOrders[item.id]) {
 
         groupedOrders[item.id] = {
+
           id: item.id,
+
           total: item.total,
+
           status: item.status,
-          order_date: item.order_date,
+
+          order_date:
+            item.order_date,
+
           items: []
         };
       }
 
-      groupedOrders[item.id].items.push({
-        name: item.item_name,
-        quantity: item.quantity,
-        image: item.image,
-        price: item.price
-      });
+      groupedOrders[item.id]
+        .items.push({
+
+          name: item.item_name,
+
+          quantity:
+            item.quantity,
+
+          image: item.image,
+
+          price: item.price
+        });
     });
 
-    // ================= HTML =================
     let html = "";
 
-    Object.values(groupedOrders).forEach(order => {
+    Object.values(
+      groupedOrders
+    ).forEach(order => {
 
       html += `
 
@@ -499,7 +618,10 @@ async function loadMyOrders() {
           </div>
 
           <p>
-            📅 ${new Date(order.order_date).toLocaleString()}
+            📅
+            ${new Date(
+              order.order_date
+            ).toLocaleString()}
           </p>
 
           <div class="order-items">
@@ -521,7 +643,9 @@ async function loadMyOrders() {
               <h4>${item.name}</h4>
 
               <p>
-                ${item.quantity} × ${item.price} ETB
+                ${item.quantity}
+                ×
+                ${item.price} ETB
               </p>
 
             </div>
@@ -532,29 +656,14 @@ async function loadMyOrders() {
       });
 
       html += `
+
           </div>
 
           <h3>
-            Total: ${order.total} ETB
+            Total:
+            ${order.total} ETB
           </h3>
-      `;
 
-      // ================= CONFIRM BUTTON =================
-      if (order.status === "completed") {
-
-        html += `
-
-          <button
-            class="confirm-btn"
-            onclick="confirmMyOrder(${order.id})"
-          >
-            ✅ I Received My Order
-          </button>
-
-        `;
-      }
-
-      html += `
         </div>
       `;
     });
@@ -565,7 +674,9 @@ async function loadMyOrders() {
 
     console.error(error);
 
-    showToast("Error loading orders");
+    showToast(
+      "Error loading orders"
+    );
   }
 }
 
@@ -576,11 +687,11 @@ async function payNow() {
 
     const user = getUser();
 
-    // ================= CHECK LOGIN =================
+    if (!user || !getToken()) {
 
-    if (!user) {
-
-      alert("Please login first");
+      alert(
+        "Please login first"
+      );
 
       window.location.href =
         "login.html";
@@ -588,40 +699,32 @@ async function payNow() {
       return;
     }
 
-    // ================= CHECK CART =================
-
     if (cart.length === 0) {
 
-      alert("Cart is empty");
+      alert(
+        "Cart is empty"
+      );
+
       return;
     }
-
-    // ================= CALCULATE TOTAL =================
 
     let total = 0;
 
     cart.forEach(item => {
 
       total +=
-        item.price * item.quantity;
+        item.price *
+        item.quantity;
     });
-
-    // ================= PREPARE ITEMS =================
 
     const orderItems =
       cart.map(item => ({
 
         menu_id: item.id,
 
-        quantity: item.quantity
-
+        quantity:
+          item.quantity
       }));
-
-    console.log("USER:", user);
-    console.log("ITEMS:", orderItems);
-    console.log("TOTAL:", total);
-
-    // ================= PAYMENT REQUEST =================
 
     const response = await fetch(
       `${API}/api/payment/initialize`,
@@ -646,15 +749,12 @@ async function payNow() {
             "Customer",
 
           items: orderItems
-
         })
       }
     );
 
     const data =
       await response.json();
-
-    // ================= ERROR =================
 
     if (!response.ok) {
 
@@ -666,8 +766,6 @@ async function payNow() {
       return;
     }
 
-    // ================= REDIRECT =================
-
     window.location.href =
       data.checkout_url;
 
@@ -678,15 +776,19 @@ async function payNow() {
     alert("Payment failed");
   }
 }
+
 // ================= TOAST =================
 function showToast(message) {
 
   const toast =
-    document.getElementById("toast");
+    document.getElementById(
+      "toast"
+    );
 
   if (!toast) {
 
     alert(message);
+
     return;
   }
 
@@ -696,7 +798,9 @@ function showToast(message) {
 
   setTimeout(() => {
 
-    toast.classList.remove("show");
+    toast.classList.remove(
+      "show"
+    );
 
   }, 3000);
 }
@@ -707,27 +811,38 @@ function updateNavbar() {
   const user = getUser();
 
   const loginLink =
-    document.getElementById("loginLink");
+    document.getElementById(
+      "loginLink"
+    );
 
   const registerLink =
-    document.getElementById("registerLink");
+    document.getElementById(
+      "registerLink"
+    );
 
   const logoutLink =
-    document.getElementById("logoutLink");
+    document.getElementById(
+      "logoutLink"
+    );
 
   const dashboardLink =
-    document.getElementById("dashboardLink");
+    document.getElementById(
+      "dashboardLink"
+    );
 
   if (user) {
 
     if (loginLink)
-      loginLink.style.display = "none";
+      loginLink.style.display =
+        "none";
 
     if (registerLink)
-      registerLink.style.display = "none";
+      registerLink.style.display =
+        "none";
 
     if (logoutLink)
-      logoutLink.style.display = "inline-block";
+      logoutLink.style.display =
+        "inline-block";
 
     if (
       dashboardLink &&
@@ -741,39 +856,38 @@ function updateNavbar() {
   } else {
 
     if (logoutLink)
-      logoutLink.style.display = "none";
+      logoutLink.style.display =
+        "none";
 
     if (dashboardLink)
-      dashboardLink.style.display = "none";
+      dashboardLink.style.display =
+        "none";
   }
 }
 
 // ================= GO HOME =================
-
 function goHome() {
 
-  window.location.href = "index.html";
+  window.location.href =
+    "index.html";
 }
 
 // ================= GO DASHBOARD =================
-
 function goDashboard() {
 
   const user = getUser();
 
-  if (!user) {
-    return;
-  }
+  if (!user) return;
 
-  // ✅ Admin Dashboard
   if (user.role === "admin") {
 
-    window.location.href = "dashboard.html";
+    window.location.href =
+      "dashboard.html";
 
   } else {
 
-    // ✅ Customer Home
-    window.location.href = "index.html";
+    window.location.href =
+      "index.html";
   }
 }
 
