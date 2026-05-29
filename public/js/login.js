@@ -157,33 +157,33 @@ async function loginUser(e) {
         role
       );
 
-      // ================= ADMIN =================
+     // ================= ADMIN =================
 
-      if (role === "admin") {
+if (role === "admin") {
 
-        console.log(
-          "Redirecting to dashboard..."
-        );
+  console.log(
+    "Redirecting to dashboard..."
+  );
 
-        window.location.href =
-          "/dashboard.html";
+  window.location.href =
+    "dashboard.html";
 
-        return;
-      }
+  return;
+}
 
-      // ================= USER =================
+// ================= USER =================
 
-      if (role === "user") {
+if (role === "user") {
 
-        console.log(
-          "Redirecting to order page..."
-        );
+  console.log(
+    "Redirecting to order page..."
+  );
 
-        window.location.href =
-          "/order.html";
+  window.location.href =
+    "order.html";
 
-        return;
-      }
+  return;
+}
 
       // ================= UNKNOWN ROLE =================
 
