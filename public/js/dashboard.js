@@ -511,37 +511,43 @@ async function loadOrders() {
 
           <select id="status-${order.id}">
 
-            <option value="pending"
-              ${order.status === "pending" ? "selected" : ""}
-            >
-              Pending
-            </option>
+      <option value="pending"
+    ${order.status === "pending" ? "selected" : ""}
+   >
+    Pending
+  </option>
 
-            <option value="preparing"
-              ${order.status === "preparing" ? "selected" : ""}
-            >
-              Preparing
-            </option>
+  <option value="awaiting_payment"
+    ${order.status === "awaiting_payment" ? "selected" : ""}
+  >
+    Awaiting Payment
+  </option>
 
-            <option value="completed"
-              ${order.status === "completed" ? "selected" : ""}
-            >
-              Completed
-            </option>
+  <option value="paid"
+    ${order.status === "paid" ? "selected" : ""}
+  >
+    Paid
+  </option>
 
-            <option value="cancelled"
-              ${order.status === "cancelled" ? "selected" : ""}
-            >
-              Cancelled
-            </option>
+  <option value="completed"
+    ${order.status === "completed" ? "selected" : ""}
+  >
+    Completed
+  </option>
 
-            <option value="delivered"
-              ${order.status === "delivered" ? "selected" : ""}
-            >
-              Delivered
-            </option>
+  <option value="delivered"
+    ${order.status === "delivered" ? "selected" : ""}
+  >
+    Delivered
+  </option>
 
-          </select>
+  <option value="cancelled"
+    ${order.status === "cancelled" ? "selected" : ""}
+  >
+    Cancelled
+  </option>
+
+   </select>
 
           <button onclick="confirmStatus(${order.id})">
             ✔ Update

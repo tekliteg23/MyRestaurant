@@ -266,12 +266,13 @@ exports.updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const allowedStatus = [
-      "pending",
-      "preparing",
-      "completed",
-      "cancelled",
-      "delivered"
+   const allowedStatus = [
+  "pending",
+  "awaiting_payment",
+  "paid",
+  "completed",
+  "delivered",
+  "cancelled"
     ];
 
     if (

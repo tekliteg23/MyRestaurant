@@ -11,6 +11,12 @@ router.post(
   paymentController.initializePayment
 );
 
+// ================= PAY EXISTING ORDER =================
+router.post(
+  "/initialize/:orderId",
+  paymentController.initializePayment
+);
+
 // ================= VERIFY =================
 router.get(
   "/verify/:tx_ref",

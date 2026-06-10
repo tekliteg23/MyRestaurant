@@ -612,7 +612,7 @@ async function loadMyOrders() {
             </h3>
 
             <span class="status ${order.status}">
-              ${order.status}
+              ${order.status.replace("_", " ").toUpperCase()}
             </span>
 
           </div>
@@ -659,12 +659,38 @@ async function loadMyOrders() {
 
           </div>
 
-          <h3>
-            Total:
-            ${order.total} ETB
-          </h3>
+         <h3>
+      Total:
+      ${order.total} ETB
+      </h3>
+     `;
 
-        </div>
+    if (order.status === "awaiting_payment") {
+
+     html += `
+    <button
+      class="pay-btn"
+      onclick="payOrder(${order.id})"
+    >
+      💳 Pay Now
+    </button>
+  `;
+  }
+
+   if (order.status === "completed") {
+
+   html += `
+    <button
+      class="confirm-btn"
+      onclick="confirmMyOrder(${order.id})"
+    >
+      📦 I Received My Order
+    </button>
+  `;
+   }
+
+      html += `
+      </div>
       `;
     });
 
@@ -736,20 +762,20 @@ async function payNow() {
             "application/json"
         },
 
-        body: JSON.stringify({
+       body: JSON.stringify({
 
-          amount: total,
+  user_id: user.id,
 
-          email: user.email,
+  amount: total,
 
-          first_name:
-            user.name,
+  email: user.email,
 
-          last_name:
-            "Customer",
+  first_name: user.name,
 
-          items: orderItems
-        })
+  last_name: "Customer",
+
+  items: orderItems
+    })
       }
     );
 
@@ -774,6 +800,43 @@ async function payNow() {
     console.error(error);
 
     alert("Payment failed");
+  }
+}
+
+// ================= PAY EXISTING ORDER =================
+async function payOrder(orderId) {
+
+  try {
+
+    const response = await fetch(
+      `${API}/api/payment/initialize/${orderId}`,
+      {
+        method: "POST",
+        headers: authHeaders()
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+      showToast(
+        data.message || "Payment failed"
+      );
+
+      return;
+    }
+
+    window.location.href =
+      data.checkout_url;
+
+  } catch (error) {
+
+    console.error(error);
+
+    showToast(
+      "Payment failed"
+    );
   }
 }
 

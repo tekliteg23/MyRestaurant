@@ -32,7 +32,8 @@ exports.initializePayment = async (req, res) => {
       email,
       first_name,
       last_name,
-      items
+      items,
+      user_id
     } = req.body;
 
     // ================= VALIDATION =================
@@ -58,25 +59,26 @@ exports.initializePayment = async (req, res) => {
     // ================= SAVE ORDER =================
 
     const [orderResult] = await db.query(
-      `
-      INSERT INTO orders
-      (
-        customer_name,
-        total,
-        payment_status,
-        tx_ref,
-        status
-      )
-      VALUES (?, ?, ?, ?, ?)
-      `,
-      [
-        first_name,
-        amount,
-        "unpaid",
-        tx_ref,
-        "pending"
-      ]
-    );
+  `
+  INSERT INTO orders
+  (
+    user_id,
+    total,
+    payment_status,
+    tx_ref,
+    status,
+    order_date
+  )
+  VALUES (?, ?, ?, ?, ?, NOW())
+  `,
+  [
+    user_id,
+    amount,
+    "unpaid",
+    tx_ref,
+    "awaiting_payment"
+  ]
+);
 
     const orderId =
       orderResult.insertId;
@@ -230,13 +232,15 @@ exports.verifyPayment = async (req, res) => {
     ) {
 
       await db.query(
-        `
-        UPDATE orders
-        SET payment_status = 'paid'
-        WHERE tx_ref = ?
-        `,
-        [tx_ref]
-      );
+  `
+  UPDATE orders
+  SET
+    payment_status = 'paid',
+    status = 'paid'
+  WHERE tx_ref = ?
+  `,
+  [tx_ref]
+    );
 
       console.log(
         "PAYMENT UPDATED TO PAID"
