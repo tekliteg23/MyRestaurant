@@ -132,14 +132,16 @@ exports.createOrder = async (req, res) => {
       (
         user_id,
         total,
+        payment_status,
         status,
         order_date
       )
-      VALUES (?, ?, ?, NOW())
+      VALUES (?, ?, ?,?,NOW())
       `,
       [
         userId,
         total,
+        "unpaid",
         "pending"
       ]
     );
@@ -222,6 +224,7 @@ exports.getMyOrders = async (req, res) => {
         o.id,
         o.total,
         o.status,
+        o.payment_status,
         o.order_date,
 
         m.name AS item_name,
@@ -268,10 +271,15 @@ exports.updateOrderStatus = async (req, res) => {
 
    const allowedStatus = [
   "pending",
+
   "awaiting_payment",
+
   "paid",
+
   "completed",
+
   "delivered",
+
   "cancelled"
     ];
 
@@ -285,14 +293,42 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    const [result] = await db.query(
-      `
-      UPDATE orders
-      SET status = ?
-      WHERE id = ?
-      `,
-      [status, id]
-    );
+   const [result] = await db.query(
+`
+UPDATE orders
+
+SET
+
+status = ?,
+
+payment_status =
+
+CASE
+
+WHEN ? = 'paid'
+THEN 'paid'
+
+WHEN ? = 'completed'
+THEN 'paid'
+
+WHEN ? = 'delivered'
+THEN 'paid'
+
+ELSE payment_status
+
+END
+
+WHERE id = ?
+
+`,
+[
+status,
+status,
+status,
+status,
+id
+]
+);
 
     if (result.affectedRows === 0) {
 
@@ -358,7 +394,7 @@ exports.confirmOrder = async (req, res) => {
 
       return res.status(400).json({
         message:
-          "Order is not ready for confirmation"
+          "Order not completed yet"
       });
     }
 

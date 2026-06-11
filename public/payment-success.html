@@ -3,141 +3,197 @@
 
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Payment Successful</title>
+<title>Payment Successful</title>
 
-  <style>
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+<style>
 
-    body{
-      background:#050505;
-      color:#fff;
-      font-family:'Poppins',Arial,sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-    }
+body{
 
-    .success-card{
-      background:#111;
-      padding:40px;
-      border-radius:20px;
-      text-align:center;
-      width:90%;
-      max-width:500px;
-      box-shadow:0 0 25px rgba(0,255,0,0.15);
-    }
+background:#111;
 
-    .icon{
-      font-size:70px;
-      margin-bottom:20px;
-    }
+color:white;
 
-    h1{
-      margin-bottom:15px;
-      color:#00ff66;
-    }
+text-align:center;
 
-    p{
-      font-size:18px;
-      margin-bottom:15px;
-    }
+padding-top:100px;
 
-    .countdown{
-      color:#aaa;
-      font-size:14px;
-    }
+font-family:Arial, sans-serif;
 
-    .home-btn{
-      display:inline-block;
-      margin-top:25px;
-      padding:12px 25px;
-      background:#00aa22;
-      color:white;
-      text-decoration:none;
-      border-radius:10px;
-      font-weight:600;
-      transition:0.3s;
-    }
+}
 
-    .home-btn:hover{
-      background:#00cc33;
-    }
 
-  </style>
+.success-box{
+
+background:#1f1f1f;
+
+width:350px;
+
+margin:auto;
+
+padding:40px;
+
+border-radius:15px;
+
+box-shadow:0 0 20px rgba(0,255,0,0.3);
+
+}
+
+
+h1{
+
+color:#00ff66;
+
+}
+
+
+button{
+
+margin-top:20px;
+
+background:#00aa55;
+
+color:white;
+
+border:none;
+
+padding:15px 30px;
+
+border-radius:10px;
+
+font-size:16px;
+
+cursor:pointer;
+
+}
+
+
+button:hover{
+
+background:#008844;
+
+}
+
+
+#countdown{
+
+color:#ffd700;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
+
+</style>
+
 
 </head>
 
+
+
 <body>
 
-  <div class="success-card">
 
-    <div class="icon">
-      ✅
-    </div>
 
-    <h1>
-      Payment Successful
-    </h1>
+<div class="success-box">
 
-    <p>
-      Your order has been received successfully.
-    </p>
 
-    <p class="countdown">
-      Redirecting to Home Page in
-      <span id="timer">3</span>
-      seconds...
-    </p>
+<h1>
+✅ Payment Successful
+</h1>
 
-    <a
-      href="index.html"
-      class="home-btn"
-    >
-      🏠 Go To Home Now
-    </a>
 
-  </div>
+<p>
+Your order has been received successfully.
+</p>
 
-  <script>
 
-    let seconds = 3;
+<p>
+You will be redirected to order page in
+</p>
 
-    const timer =
-      document.getElementById("timer");
 
-    const interval =
-      setInterval(() => {
+<p id="countdown">
+3
+</p>
 
-        seconds--;
 
-        if (timer) {
-          timer.innerText = seconds;
-        }
 
-        if (seconds <= 0) {
+<button onclick="goOrder()">
 
-          clearInterval(interval);
+🍽 Continue Ordering
 
-          window.location.href =
-            "index.html";
-        }
+</button>
 
-      }, 1000);
 
-  </script>
+</div>
+
+
+
+
+
+<script>
+
+
+let seconds = 3;
+
+
+
+const timer =
+setInterval(()=>{
+
+
+seconds--;
+
+
+document.getElementById(
+"countdown"
+).innerText = seconds;
+
+
+
+if(seconds <=0){
+
+
+clearInterval(timer);
+
+
+goOrder();
+
+
+}
+
+
+},1000);
+
+
+
+
+
+
+function goOrder(){
+
+
+window.location.href =
+"order.html";
+
+
+}
+
+
+
+</script>
+
+
+
 
 </body>
+
+
 </html>
