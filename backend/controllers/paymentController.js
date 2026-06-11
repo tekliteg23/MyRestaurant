@@ -13,7 +13,7 @@ const CHAPA_SECRET_KEY =
 // ✅ CHECK KEY
 console.log(
   "CHAPA KEY:",
-  CHAPA_SECRET_KEY
+  CHAPA_SECRET_KEY ? "Loaded" : "Missing"
 );
 
 // ================= INITIALIZE PAYMENT =================
@@ -56,7 +56,7 @@ exports.initializePayment = async (req, res) => {
     const tx_ref =
       "tx-" + Date.now();
 
-    // ================= SAVE ORDER =================
+    // ================= CREATE ORDER =================
 
     const [orderResult] = await db.query(
   `
@@ -91,6 +91,27 @@ exports.initializePayment = async (req, res) => {
     // ================= SAVE ORDER ITEMS =================
 
     for (const item of items) {
+const [menuRows] = await db.query(
+
+`
+SELECT price
+FROM menu
+WHERE id=?
+
+`,
+
+[item.menu_id]
+
+);
+
+
+
+if(menuRows.length===0){
+
+continue;
+
+}
+
 
       await db.query(
         `
@@ -98,14 +119,16 @@ exports.initializePayment = async (req, res) => {
         (
           order_id,
           menu_id,
-          quantity
+          quantity,
+          price
         )
-        VALUES (?, ?, ?)
+        VALUES (?, ?, ?,?)
         `,
         [
           orderId,
           item.menu_id,
-          item.quantity
+          item.quantity,
+          menuRows[0].price
         ]
       );
     }
@@ -134,8 +157,8 @@ exports.initializePayment = async (req, res) => {
         callback_url:
            `https://restaurant-backend-umgr.onrender.com/api/payment/verify/${tx_ref}`,
 
-        return_url:
-               "https://restaurant-backend-umgr.onrender.com/payment-success.html"
+       return_url:
+                   "https://restaurant-backend-umgr.onrender.com/payment-success"
       },
       {
         headers: {
@@ -249,8 +272,9 @@ exports.verifyPayment = async (req, res) => {
 
     // ================= REDIRECT =================
 
-     res.redirect(
-        "https://restaurant-backend-umgr.onrender.com/payment-success.html"
+     return res.redirect(
+
+               "https://restaurant-backend-umgr.onrender.com/payment-success"
         );
 
   } catch (error) {
