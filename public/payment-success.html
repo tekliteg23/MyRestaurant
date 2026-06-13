@@ -83,7 +83,7 @@ background:#008844;
 
 color:#ffd700;
 
-font-size:20px;
+font-size:22px;
 
 font-weight:bold;
 
@@ -92,13 +92,11 @@ font-weight:bold;
 
 </style>
 
-
 </head>
 
 
 
 <body>
-
 
 
 <div class="success-box">
@@ -115,7 +113,7 @@ Your order has been received successfully.
 
 
 <p>
-You will be redirected to order page in
+Continue ordering again in:
 </p>
 
 
@@ -137,16 +135,13 @@ You will be redirected to order page in
 
 
 
-
 <script>
 
 
 let seconds = 3;
 
 
-
-const timer =
-setInterval(()=>{
+const timer = setInterval(()=>{
 
 
 seconds--;
@@ -158,7 +153,7 @@ document.getElementById(
 
 
 
-if(seconds <=0){
+if(seconds <= 0){
 
 
 clearInterval(timer);
@@ -176,8 +171,25 @@ goOrder();
 
 
 
-
 function goOrder(){
+
+
+/*
+ Keep login session
+ token and user remain in localStorage
+ */
+
+
+const token =
+localStorage.getItem("token");
+
+
+const user =
+localStorage.getItem("user");
+
+
+
+if(token && user){
 
 
 window.location.href =
@@ -186,11 +198,21 @@ window.location.href =
 
 }
 
+else{
+
+
+window.location.href =
+"login.html";
+
+
+}
+
+
+}
+
 
 
 </script>
-
-
 
 
 </body>

@@ -448,6 +448,7 @@ async function loadOrders() {
         customer_name: row.customer_name || "Unknown",
         total: row.total || 0,
         status: row.status || "pending",
+        payment_status:row.payment_status || "unpaid",
         order_date: row.order_date || "",
         items: []
       };
@@ -475,6 +476,7 @@ async function loadOrders() {
         <th>Items</th>
         <th>Total</th>
         <th>Status</th>
+         <th>Payment</th>
         <th>Date</th>
       </tr>
   `;
@@ -512,10 +514,10 @@ async function loadOrders() {
           <select id="status-${order.id}">
 
       <option value="pending"
-    ${order.status === "pending" ? "selected" : ""}
-   >
-    Pending
-  </option>
+         ${order.status === "pending" ? "selected" : ""}
+         >
+      Pending
+       </option>
 
   <option value="awaiting_payment"
     ${order.status === "awaiting_payment" ? "selected" : ""}
@@ -554,6 +556,10 @@ async function loadOrders() {
           </button>
 
         </td>
+
+            <td>
+          ${order.payment_status}
+          </td>
 
         <td>
           ${new Date(order.order_date).toLocaleString()}
@@ -607,6 +613,7 @@ async function confirmMyOrder(id) {
         method: "PUT",
 
         headers: {
+          "Content-Type":"application/json",
           Authorization: `Bearer ${token}`,
         },
       }

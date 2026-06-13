@@ -677,17 +677,22 @@ async function loadMyOrders() {
   `;
   }
 
-   if (order.status === "completed") {
+   if (
+order.status === "completed"
+||
+order.status === "paid"
+) {
 
-   html += `
-    <button
-      class="confirm-btn"
-      onclick="confirmMyOrder(${order.id})"
-    >
-      📦 I Received My Order
-    </button>
-  `;
-   }
+html += `
+<button
+class="confirm-btn"
+onclick="confirmMyOrder(${order.id})"
+>
+📦 I Received My Order
+</button>
+`;
+
+}
 
       html += `
       </div>
@@ -809,14 +814,23 @@ async function payOrder(orderId) {
   try {
 
     const response = await fetch(
-      `${API}/api/payment/initialize/${orderId}`,
+      `${API}/api/payment/initialize`,
       {
         method: "POST",
-        headers: authHeaders()
+
+        headers: authHeaders(),
+
+        body: JSON.stringify({
+
+          order_id: orderId
+
+        })
       }
     );
 
+
     const data = await response.json();
+
 
     if (!response.ok) {
 
@@ -827,10 +841,12 @@ async function payOrder(orderId) {
       return;
     }
 
+
     window.location.href =
       data.checkout_url;
 
-  } catch (error) {
+
+  } catch(error) {
 
     console.error(error);
 

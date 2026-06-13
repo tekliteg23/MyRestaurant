@@ -2,292 +2,505 @@ const axios = require("axios");
 const https = require("https");
 const db = require("../config/db");
 
+
 // ================= CHAPA CONFIG =================
 
 const CHAPA_URL =
   "https://api.chapa.co/v1/transaction/initialize";
 
+
 const CHAPA_SECRET_KEY =
   process.env.CHAPA_SECRET_KEY;
 
-// ✅ CHECK KEY
+
+// CHECK KEY
+
 console.log(
   "CHAPA KEY:",
   CHAPA_SECRET_KEY ? "Loaded" : "Missing"
 );
 
-// ================= INITIALIZE PAYMENT =================
 
-exports.initializePayment = async (req, res) => {
 
-  try {
+// =================================================
+// INITIALIZE PAYMENT FOR EXISTING ORDER
+// =================================================
 
-    console.log(
-      "PAYMENT BODY:",
-      req.body
-    );
+exports.initializePayment = async (req,res)=>{
 
-    const {
-      amount,
-      email,
-      first_name,
-      last_name,
-      items,
-      user_id
-    } = req.body;
 
-    // ================= VALIDATION =================
+try{
 
-    if (
-      !amount ||
-      !email ||
-      !first_name ||
-      !items ||
-      items.length === 0
-    ) {
 
-      return res.status(400).json({
-        message: "Missing payment data"
-      });
-    }
-
-    // ================= GENERATE TX REF =================
-
-    const tx_ref =
-      "tx-" + Date.now();
-
-    // ================= CREATE ORDER =================
-
-    const [orderResult] = await db.query(
-  `
-  INSERT INTO orders
-  (
-    user_id,
-    total,
-    payment_status,
-    tx_ref,
-    status,
-    order_date
-  )
-  VALUES (?, ?, ?, ?, ?, NOW())
-  `,
-  [
-    user_id,
-    amount,
-    "unpaid",
-    tx_ref,
-    "awaiting_payment"
-  ]
-);
-
-    const orderId =
-      orderResult.insertId;
-
-    console.log(
-      "ORDER CREATED:",
-      orderId
-    );
-
-    // ================= SAVE ORDER ITEMS =================
-
-    for (const item of items) {
-const [menuRows] = await db.query(
-
-`
-SELECT price
-FROM menu
-WHERE id=?
-
-`,
-
-[item.menu_id]
-
+console.log(
+"PAYMENT BODY:",
+req.body
 );
 
 
 
-if(menuRows.length===0){
+const {
+order_id
+}=req.body;
 
-continue;
+
+
+// ================= VALIDATION =================
+
+
+if(!order_id){
+
+
+return res.status(400).json({
+
+message:"Order ID required"
+
+});
+
 
 }
 
 
-      await db.query(
-        `
-        INSERT INTO order_items
-        (
-          order_id,
-          menu_id,
-          quantity,
-          price
-        )
-        VALUES (?, ?, ?,?)
-        `,
-        [
-          orderId,
-          item.menu_id,
-          item.quantity,
-          menuRows[0].price
-        ]
-      );
-    }
 
-    console.log(
-      "ORDER ITEMS SAVED"
-    );
+// ================= GET EXISTING ORDER =================
 
-    // ================= CHAPA REQUEST =================
 
-    const chapaResponse = await axios.post(
-      CHAPA_URL,
-      {
-        amount,
-        currency: "ETB",
+const [orders] = await db.query(
 
-        email,
+`
 
-        first_name,
+SELECT
 
-        last_name:
-          last_name || "Customer",
+o.id,
+o.total,
 
-        tx_ref,
+u.name,
+u.email
 
-        callback_url:
-           `https://restaurant-backend-umgr.onrender.com/api/payment/verify/${tx_ref}`,
 
-       return_url:
-                   "https://restaurant-backend-umgr.onrender.com/payment-success"
-      },
-      {
-        headers: {
+FROM orders o
 
-          Authorization:
-            `Bearer ${CHAPA_SECRET_KEY}`,
 
-          "Content-Type":
-            "application/json"
-        },
+JOIN users u
 
-        // ✅ FIX SSL CERTIFICATE ERROR
-        httpsAgent:
-          new https.Agent({
-            rejectUnauthorized: false
-          })
-      }
-    );
+ON o.user_id = u.id
 
-    console.log(
-      "CHAPA RESPONSE:",
-      chapaResponse.data
-    );
 
-    // ================= SUCCESS =================
+WHERE o.id = ?
 
-    return res.status(200).json({
-      checkout_url:
-        chapaResponse.data.data.checkout_url
-    });
 
-  } catch (error) {
+`,
 
-    console.error(
-      "CHAPA ERROR FULL:",
-      error.response?.data || error.message
-    );
+[order_id]
 
-    return res.status(500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Payment initialization failed"
-    });
-  }
+
+);
+
+
+
+if(orders.length===0){
+
+
+return res.status(404).json({
+
+message:"Order not found"
+
+});
+
+
+}
+
+
+
+const order = orders[0];
+
+
+
+
+// ================= CREATE TRANSACTION REF =================
+
+
+const tx_ref =
+"tx-" + Date.now();
+
+
+
+
+// ================= UPDATE EXISTING ORDER =================
+
+
+await db.query(
+
+`
+
+UPDATE orders
+
+SET
+
+tx_ref=?,
+
+payment_status='unpaid',
+
+status='awaiting_payment'
+
+
+WHERE id=?
+
+
+`,
+
+[
+
+tx_ref,
+
+order_id
+
+]
+
+
+);
+
+
+
+console.log(
+
+"TX REF SAVED:",
+
+tx_ref
+
+);
+
+
+
+
+// ================= CHAPA INITIALIZE =================
+
+
+const chapaResponse = await axios.post(
+
+
+CHAPA_URL,
+
+
+{
+
+
+amount:
+order.total,
+
+
+currency:
+"ETB",
+
+
+
+email:
+order.email,
+
+
+
+first_name:
+order.name,
+
+
+
+last_name:
+"Customer",
+
+
+
+tx_ref,
+
+
+
+callback_url:
+
+`https://restaurant-backend-umgr.onrender.com/api/payment/verify/${tx_ref}`,
+
+
+
+return_url:
+
+"https://restaurant-backend-umgr.onrender.com/payment-success"
+
+
+},
+
+
+
+{
+
+
+headers:{
+
+
+Authorization:
+
+`Bearer ${CHAPA_SECRET_KEY}`,
+
+
+
+"Content-Type":
+
+"application/json"
+
+
+},
+
+
+
+httpsAgent:
+
+new https.Agent({
+
+rejectUnauthorized:false
+
+})
+
+
+}
+
+
+
+);
+
+
+
+console.log(
+
+"CHAPA RESPONSE:",
+
+chapaResponse.data
+
+);
+
+
+
+
+// ================= SEND CHECKOUT URL =================
+
+
+return res.json({
+
+
+checkout_url:
+
+chapaResponse.data.data.checkout_url
+
+
+});
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+
+"PAYMENT INITIALIZE ERROR:",
+
+error.response?.data ||
+error.message
+
+);
+
+
+
+return res.status(500).json({
+
+message:
+
+"Payment initialization failed"
+
+});
+
+
+}
+
+
+
 };
 
-// ================= VERIFY PAYMENT =================
 
-exports.verifyPayment = async (req, res) => {
 
-  try {
 
-    const tx_ref =
-      req.params.tx_ref;
 
-    console.log(
-      "VERIFY TX:",
-      tx_ref
-    );
 
-    // ================= VERIFY PAYMENT =================
+// =================================================
+// VERIFY PAYMENT
+// =================================================
 
-    const response = await axios.get(
-      `https://api.chapa.co/v1/transaction/verify/${tx_ref}`,
-      {
-        headers: {
 
-          Authorization:
-            `Bearer ${CHAPA_SECRET_KEY}`
+exports.verifyPayment = async(req,res)=>{
 
-        },
 
-        // ✅ FIX SSL CERTIFICATE ERROR
-        httpsAgent:
-          new https.Agent({
-            rejectUnauthorized: false
-          })
-      }
-    );
+try{
 
-    console.log(
-      "VERIFY RESPONSE:",
-      response.data
-    );
 
-    const payment =
-      response.data.data;
+const tx_ref =
+req.params.tx_ref;
 
-    // ================= PAYMENT SUCCESS =================
 
-    if (
-      payment.status === "success"
-    ) {
 
-      await db.query(
-  `
-  UPDATE orders
-  SET
-    payment_status = 'paid',
-    status = 'paid'
-  WHERE tx_ref = ?
-  `,
-  [tx_ref]
-    );
+console.log(
 
-      console.log(
-        "PAYMENT UPDATED TO PAID"
-      );
-    }
+"VERIFY TX:",
 
-    // ================= REDIRECT =================
+tx_ref
 
-     return res.redirect(
+);
 
-               "https://restaurant-backend-umgr.onrender.com/payment-success"
-        );
 
-  } catch (error) {
 
-    console.error(
-      "VERIFY ERROR:",
-      error.response?.data || error.message
-    );
 
-    res.status(500).json({
-      message:
-        error.response?.data?.message ||
-        "Verification failed"
-    });
-  }
+// ================= VERIFY CHAPA =================
+
+
+
+const response = await axios.get(
+
+
+`https://api.chapa.co/v1/transaction/verify/${tx_ref}`,
+
+
+{
+
+
+headers:{
+
+
+Authorization:
+
+`Bearer ${CHAPA_SECRET_KEY}`
+
+
+},
+
+
+
+httpsAgent:
+
+new https.Agent({
+
+rejectUnauthorized:false
+
+})
+
+
+}
+
+
+
+);
+
+
+
+console.log(
+
+"VERIFY RESPONSE:",
+
+response.data
+
+);
+
+
+
+const payment =
+response.data.data;
+
+
+
+
+// ================= SUCCESS =================
+
+
+
+if(payment.status==="success"){
+
+
+
+await db.query(
+
+`
+
+UPDATE orders
+
+SET
+
+payment_status='paid',
+
+status='paid'
+
+
+WHERE tx_ref=?
+
+
+`,
+
+
+[tx_ref]
+
+
+);
+
+
+
+console.log(
+
+"ORDER UPDATED TO PAID"
+
+);
+
+
+
+}
+
+
+
+
+
+// ================= REDIRECT =================
+
+
+return res.redirect(
+
+
+"https://restaurant-backend-umgr.onrender.com/payment-success"
+
+
+);
+
+
+
+}
+
+
+
+catch(error){
+
+
+console.error(
+
+"VERIFY ERROR:",
+
+error.response?.data ||
+error.message
+
+);
+
+
+
+return res.status(500).json({
+
+message:"Verification failed"
+
+});
+
+
+}
+
+
+
 };
