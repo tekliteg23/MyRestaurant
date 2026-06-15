@@ -1,10 +1,11 @@
 // ================= CONFIG =================
 
 // Localhost for development
-// const API = "http://localhost:5000";
+
+//const API = "http://localhost:5000";
 
 // Production Render API
-const API = "https://restaurant-backend-umgr.onrender.com";
+  const API = "https://restaurant-backend-umgr.onrender.com";
 
 // ================= STATE =================
 let allMenu = [];
@@ -708,103 +709,6 @@ onclick="confirmMyOrder(${order.id})"
     showToast(
       "Error loading orders"
     );
-  }
-}
-
-// ================= PAYMENT =================
-async function payNow() {
-
-  try {
-
-    const user = getUser();
-
-    if (!user || !getToken()) {
-
-      alert(
-        "Please login first"
-      );
-
-      window.location.href =
-        "login.html";
-
-      return;
-    }
-
-    if (cart.length === 0) {
-
-      alert(
-        "Cart is empty"
-      );
-
-      return;
-    }
-
-    let total = 0;
-
-    cart.forEach(item => {
-
-      total +=
-        item.price *
-        item.quantity;
-    });
-
-    const orderItems =
-      cart.map(item => ({
-
-        menu_id: item.id,
-
-        quantity:
-          item.quantity
-      }));
-
-    const response = await fetch(
-      `${API}/api/payment/initialize`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-       body: JSON.stringify({
-
-  user_id: user.id,
-
-  amount: total,
-
-  email: user.email,
-
-  first_name: user.name,
-
-  last_name: "Customer",
-
-  items: orderItems
-    })
-      }
-    );
-
-    const data =
-      await response.json();
-
-    if (!response.ok) {
-
-      alert(
-        data.message ||
-        "Payment failed"
-      );
-
-      return;
-    }
-
-    window.location.href =
-      data.checkout_url;
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert("Payment failed");
   }
 }
 

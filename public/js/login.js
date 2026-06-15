@@ -1,11 +1,12 @@
 // ================= CONFIG =================
 
 // Localhost for development
-// const API = "http://localhost:5000";
+
+   //const API = "http://localhost:5000";
 
 // Production Render API
-const API =
-  "https://restaurant-backend-umgr.onrender.com";
+
+ const API = "https://restaurant-backend-umgr.onrender.com";
 
 // ================= INIT =================
 
