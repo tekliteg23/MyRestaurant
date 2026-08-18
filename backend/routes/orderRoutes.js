@@ -13,6 +13,7 @@ const {
 
 // ================= CUSTOMER ROUTES =================
 
+
 // CREATE ORDER
 router.post(
   "/",
@@ -20,14 +21,28 @@ router.post(
   orderController.createOrder
 );
 
+
 // GET MY ORDERS
 router.get(
   "/my-orders",
   verifyToken,
   orderController.getMyOrders
 );
+router.get(
+"/:id",
+verifyToken,
+orderController.getSingleOrder
+);
 
-// CONFIRM ORDER
+// DELETE MY PENDING ORDER
+router.delete(
+  "/my-orders/:id",
+  verifyToken,
+  orderController.deleteMyOrder
+);
+
+
+// CONFIRM ORDER RECEIVED
 router.put(
   "/:id/confirm",
   verifyToken,
@@ -37,6 +52,7 @@ router.put(
 
 // ================= ADMIN ROUTES =================
 
+
 // GET ALL ORDERS
 router.get(
   "/",
@@ -44,6 +60,7 @@ router.get(
   isAdmin,
   orderController.getOrders
 );
+
 
 // UPDATE ORDER STATUS
 router.put(
@@ -53,12 +70,14 @@ router.put(
   orderController.updateOrderStatus
 );
 
-// DELETE ORDER
+
+// ADMIN DELETE ORDER
 router.delete(
-  "/:id",
+  "/admin/:id",
   verifyToken,
   isAdmin,
   orderController.deleteOrder
 );
+
 
 module.exports = router;

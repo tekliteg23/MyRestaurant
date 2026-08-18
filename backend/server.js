@@ -73,6 +73,14 @@ app.use(
   "/api/orders",
   orderRoutes
 );
+const notificationRoutes =
+require("./routes/notificationRoutes");
+
+
+app.use(
+"/api/notifications",
+notificationRoutes
+);
 
 // 💳 PAYMENT ROUTES
 const paymentRoutes =

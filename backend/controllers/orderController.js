@@ -139,7 +139,7 @@ exports.createOrder = async (req, res) => {
       VALUES (?, ?, ?,?,NOW())
       `,
       [
-        userId,
+       userId,
         total,
         "unpaid",
         "pending"
@@ -262,38 +262,69 @@ exports.getMyOrders = async (req, res) => {
 };
 
 // ================= 🔄 UPDATE ORDER STATUS =================
+
 exports.updateOrderStatus = async (req, res) => {
 
   try {
 
+// ================= SECURITY CHECK =================
+
+
+if(
+!req.user ||
+req.user.role !== "admin"
+){
+
+return res.status(403).json({
+
+message:
+"Admin access only"
+
+});
+
+}
+// ================= GET DATA =================
+
     const { id } = req.params;
+
     const { status } = req.body;
 
-   const allowedStatus = [
-  "pending",
 
-  "awaiting_payment",
+       const allowedStatus = [
 
-  "paid",
+      "pending",
 
-  "completed",
+      "awaiting_payment",
 
-  "delivered",
+      "paid",
 
-  "cancelled"
+      "completed",
+
+      "delivered",
+
+      "cancelled"
+
     ];
 
     if (
       !status ||
       !allowedStatus.includes(status)
+
     ) {
 
       return res.status(400).json({
-        message: "Invalid status"
+
+        message:"Invalid status"
+
       });
+
     }
 
-   const [result] = await db.query(
+    // ================= UPDATE ORDER =================
+
+
+    const [result] = await db.query(
+
 `
 UPDATE orders
 
@@ -301,59 +332,221 @@ SET
 
 status = ?,
 
+
 payment_status =
 
 CASE
 
+
 WHEN ? = 'paid'
+
 THEN 'paid'
+
+
 
 WHEN ? = 'completed'
+
 THEN 'paid'
 
+
+
 WHEN ? = 'delivered'
+
 THEN 'paid'
+
+
 
 ELSE payment_status
 
+
 END
+
 
 WHERE id = ?
 
 `,
-[
-status,
-status,
-status,
-status,
-id
-]
-);
 
-    if (result.affectedRows === 0) {
+[
+
+status,
+
+status,
+
+status,
+
+status,
+
+id
+
+]
+
+);
+    if(result.affectedRows === 0){
+
 
       return res.status(404).json({
-        message: "Order not found"
+
+        message:"Order not found"
+
       });
+
+
+    }
+
+   // =================================================
+    // 🔔 CREATE USER NOTIFICATION
+    // =================================================
+
+
+    if(status === "awaiting_payment"){
+
+
+
+      const [orderData] = await db.query(
+
+`
+SELECT
+
+user_id
+
+FROM orders
+
+WHERE id = ?
+
+`,
+
+[id]
+
+);
+      if(orderData.length > 0){
+
+
+
+        await db.query(
+
+`
+INSERT INTO notifications
+
+(
+
+user_id,
+
+order_id,
+
+message
+
+)
+VALUES
+
+(?,?,?)
+
+`,
+
+[
+orderData[0].user_id,
+
+id,
+
+`Your order #${id} is ready for payment. Please complete your payment.`
+
+]
+
+);
+
+      }
+
+   }
+
+    // =================================================
+    // 🔔 PAYMENT COMPLETED NOTIFICATION
+    // =================================================
+
+
+    if(status === "paid"){
+
+
+
+      const [orderData] = await db.query(
+
+`
+SELECT
+
+user_id
+
+FROM orders
+
+WHERE id = ?
+
+`,
+
+[id]
+
+);
+
+      if(orderData.length > 0){
+
+
+
+        await db.query(
+
+`
+INSERT INTO notifications
+
+(
+
+user_id,
+
+order_id,
+
+message
+
+)
+VALUES
+
+(?,?,?)
+
+`,
+
+[
+orderData[0].user_id,
+
+id,
+
+
+`Payment received for order #${id}. Your order is being processed.`
+
+]
+);
+      }
+
     }
 
     res.json({
-      success: true,
+
+      success:true,
+
       message:
-        "Order status updated successfully"
+
+      "Order status updated successfully"
     });
 
-  } catch (error) {
+  }
+  catch(error){
+
 
     console.error(
-      "Update Order Status Error:",
-      error
-    );
 
+      "Update Order Status Error:",
+
+      error
+
+    );
     res.status(500).json({
-      message: "Server error"
+
+      message:"Server error"
+
     });
-  }
+   }
 };
 
 // ================= 👤 CUSTOMER CONFIRM ORDER =================
@@ -472,4 +665,216 @@ exports.deleteOrder = async (req, res) => {
       message: "Server error"
     });
   }
+};
+
+// ================= 🗑 CUSTOMER DELETE PENDING ORDER =================
+
+exports.deleteMyOrder = async (req,res)=>{
+
+  try{
+
+    // CHECK LOGIN
+
+    if(!req.user || !req.user.id){
+
+      return res.status(401).json({
+        message:"Unauthorized"
+      });
+
+    }
+
+
+    const userId = req.user.id;
+
+    const { id } = req.params;
+
+
+
+    // CHECK ORDER OWNER + STATUS
+
+    const [orders] = await db.query(
+
+      `
+      SELECT *
+      FROM orders
+      WHERE id = ?
+      AND user_id = ?
+      `,
+
+      [
+        id,
+        userId
+      ]
+
+    );
+
+
+
+    if(orders.length === 0){
+
+      return res.status(404).json({
+
+        message:"Order not found"
+
+      });
+
+    }
+
+
+
+    const order = orders[0];
+
+
+
+    // ONLY PENDING CAN DELETE
+
+    if(order.status !== "pending"){
+
+
+      return res.status(400).json({
+
+        message:
+        "Only pending orders can be deleted"
+
+      });
+
+
+    }
+
+
+
+    // DELETE ITEMS FIRST
+
+    await db.query(
+
+      `
+      DELETE FROM order_items
+      WHERE order_id = ?
+      `,
+
+      [id]
+
+    );
+
+
+
+    // DELETE ORDER
+
+    await db.query(
+
+      `
+      DELETE FROM orders
+      WHERE id = ?
+      `,
+
+      [id]
+
+    );
+
+
+
+    res.json({
+
+      success:true,
+
+      message:
+      "Pending order deleted successfully"
+
+    });
+ }
+  catch(error){
+
+
+    console.error(
+      "Delete My Order Error:",
+      error
+    );
+
+
+    res.status(500).json({
+
+      message:"Server error"
+
+    });
+ }
+};
+
+// ======================================
+
+// GET SINGLE ORDER
+// ======================================
+
+exports.getSingleOrder = async (req, res) => {
+
+try{
+
+const userId = req.user.id;
+
+const { id } = req.params;
+
+const [rows] = await db.query(
+
+`
+SELECT
+
+o.id,
+o.total,
+o.status,
+o.order_date,
+
+m.name,
+m.price,
+m.image,
+
+oi.quantity
+
+FROM orders o
+
+JOIN order_items oi
+ON o.id=oi.order_id
+
+JOIN menu m
+ON oi.menu_id=m.id
+
+WHERE
+
+o.id=?
+AND
+o.user_id=?
+
+`,
+
+[
+id,
+userId
+]
+
+);
+
+if(rows.length===0){
+
+return res.status(404).json({
+
+message:"Order not found"
+
+});
+
+}
+
+res.json(rows);
+
+}
+
+catch(error){
+
+console.error(error);
+
+res.status(500).json({
+
+message:"Server error"
+
+});
+
+}
+
 };
